@@ -1,0 +1,252 @@
+Build a complete working prototype for the project:
+
+**“AI-Based Network Attack Forecasting from Network Traffic Data”**
+
+### Project Objective
+
+Develop an AI-powered cybersecurity system that analyzes network traffic data, identifies abnormal traffic patterns, and forecasts the possibility of a cyber attack before or during its early stages. The system should provide an attack type, prediction probability, risk level, and early warning alert through a web dashboard.
+
+### Core Workflow
+
+Network Traffic Data
+→ Data Collection
+→ Data Preprocessing
+→ Feature Extraction
+→ Time-Window Analysis
+→ AI/ML Prediction
+→ Attack Forecasting
+→ Attack Type Classification
+→ Risk Score Calculation
+→ Early Warning Alert
+→ Dashboard Visualization
+→ Preventive Action
+
+### Dataset
+
+Use the **CIC-IDS2018 dataset** for training and testing.
+
+The system should:
+
+* Load network traffic CSV data.
+* Handle missing values and duplicate records.
+* Encode categorical features.
+* Scale numerical features where required.
+* Select relevant network traffic features.
+* Split data into training and testing sets.
+* Handle class imbalance where necessary.
+* Train an appropriate machine-learning model.
+* Save the trained model for prediction.
+
+### AI/ML Requirements
+
+Implement a practical ML pipeline suitable for a prototype.
+
+The model should:
+
+1. Analyze network traffic features.
+2. Identify whether the traffic is normal or suspicious.
+3. Classify the possible attack type.
+4. Generate a prediction probability.
+5. Convert the prediction into a risk score.
+6. Use time-window-based traffic patterns to support forecasting rather than only simple packet-level classification.
+
+Possible attack categories include:
+
+* Benign
+* DDoS
+* DoS
+* Brute Force
+* Botnet
+* Infiltration
+* Web Attack
+* Other attack classes available in the dataset.
+
+Use an appropriate model such as Random Forest, XGBoost, Gradient Boosting, LSTM, or another suitable model. Clearly explain why the selected model is appropriate.
+
+### Forecasting Logic
+
+The system should not simply display “Attack Detected.”
+
+It should provide a forecasting-oriented output such as:
+
+**Normal Traffic**
+Risk Score: 15%
+Status: LOW
+
+**Suspicious Traffic**
+Risk Score: 68%
+Status: MEDIUM
+Warning: Possible attack activity detected.
+
+**High Risk**
+Risk Score: 91%
+Status: HIGH
+Warning: Cyber attack likely. Immediate preventive action recommended.
+
+Use recent traffic observations/time windows to calculate trends and improve the forecasting concept.
+
+### Backend
+
+Create a Python-based AI service/API using **FastAPI or Flask**.
+
+Required API functionality:
+
+* Health check
+* Upload network traffic data
+* Run preprocessing
+* Run prediction
+* Return attack type
+* Return probability
+* Return risk score
+* Return risk level
+* Return traffic statistics
+* Return forecasting result
+
+Example API response:
+
+{
+"prediction": "DDoS",
+"probability": 0.91,
+"risk_score": 91,
+"risk_level": "HIGH",
+"forecast": "Attack likely",
+"recommended_action": "Block suspicious traffic and investigate the source"
+}
+
+### Frontend Dashboard
+
+Create a modern cybersecurity dashboard using:
+
+* React + Vite
+* HTML
+* CSS
+* JavaScript
+
+The dashboard should contain:
+
+1. **Overview**
+
+   * Network status
+   * Total traffic records
+   * Normal traffic
+   * Suspicious traffic
+   * Number of predicted attacks
+
+2. **Risk Monitoring**
+
+   * Current risk score
+   * LOW / MEDIUM / HIGH indicator
+   * Attack probability
+
+3. **Attack Forecast**
+
+   * Predicted attack type
+   * Forecast status
+   * Prediction confidence
+   * Time-window trend
+
+4. **Traffic Analytics**
+
+   * Traffic volume chart
+   * Normal vs attack traffic
+   * Risk trend over time
+   * Attack distribution
+
+5. **Alerts**
+
+   * Early warning messages
+   * Attack type
+   * Severity
+   * Timestamp
+   * Recommended action
+
+6. **Dataset / Prediction**
+
+   * CSV upload option
+   * “Analyze Traffic” button
+   * Prediction results table
+
+### UI Design
+
+Use a professional cybersecurity/SOC dashboard design.
+
+The interface should be:
+
+* Modern
+* Clean
+* Responsive
+* Easy to understand
+* Suitable for an SIH prototype demonstration.
+
+Use cards, charts, tables, status indicators, alerts, and a sidebar navigation.
+
+### Database
+
+Use **MySQL** to store:
+
+* Prediction history
+* Attack type
+* Risk score
+* Prediction probability
+* Timestamp
+* Alert information
+
+### Optional Java Backend
+
+If required, create a **Java Spring Boot backend** as an API gateway between the frontend and Python AI service.
+
+Architecture:
+
+React Frontend
+↓
+Spring Boot Backend
+↓
+Python AI/ML Service
+↓
+ML Model
+↓
+CIC-IDS2018 Dataset
+
+If Spring Boot is unnecessary for the prototype, keep the architecture simple with React → FastAPI → ML model.
+
+### Security Mapping
+
+For detected attack categories, provide a basic mapping to relevant **MITRE ATT&CK techniques** where applicable.
+
+Display:
+
+* Attack type
+* MITRE ATT&CK technique
+* Risk level
+* Recommended response
+
+### Important Prototype Requirement
+
+The system must actually work with sample network traffic data.
+
+Do NOT create only a static UI with fake prediction values.
+
+Connect the frontend to the backend API and connect the backend to the trained ML model.
+
+Provide:
+
+* Complete folder structure
+* Installation commands
+* requirements.txt
+* package.json
+* Backend code
+* Frontend code
+* ML training code
+* Prediction API
+* Database schema
+* Sample dataset
+* README.md
+* Commands to run the complete project on Windows 11.
+
+Make sure the frontend and backend communicate correctly through APIs and handle errors gracefully.
+
+The final prototype should demonstrate this scenario:
+
+**Network traffic → AI analysis → Attack probability → Forecast → Risk score → Early warning → Recommended preventive action**
+
+The goal is to demonstrate how AI can help organizations move from **reactive attack detection to proactive cyber defense**.
