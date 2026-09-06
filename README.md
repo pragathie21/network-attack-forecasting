@@ -1,5 +1,11 @@
 # AI-Based Network Attack Forecasting from Network Traffic Data
 
+[![Live Demo](https://img.shields.io/badge/Live_SOC_Dashboard-Online-00f2fe?style=for-the-badge&logo=googlechrome)](https://pragathie21.github.io/network-attack-forecasting/)
+[![Deploy to Render](https://render.com/images/deploy-to-render-button.svg)](https://render.com/deploy?repo=https://github.com/pragathie21/network-attack-forecasting)
+
+> 🌐 **Live Website**: **[https://pragathie21.github.io/network-attack-forecasting/](https://pragathie21.github.io/network-attack-forecasting/)**  
+> 📦 **GitHub Repository**: **[https://github.com/pragathie21/network-attack-forecasting](https://github.com/pragathie21/network-attack-forecasting)**
+
 An AI-powered cybersecurity prototype that analyzes network traffic flows, identifies abnormal traffic signatures, and **forecasts cyber attacks before or during early escalation stages**. 
 
 The system transitions cybersecurity operations from **reactive attack detection to proactive cyber defense** by calculating rolling time-window velocity metrics, determining risk scores (0–100%), raising early warning alerts, and providing actionable **MITRE ATT&CK mitigation playbooks** through a modern Security Operations Center (SOC) dashboard.
