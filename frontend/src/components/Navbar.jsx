@@ -1,8 +1,15 @@
 import React from 'react';
 
-export default function Navbar({ trafficStats, apiOnline, onQuickLoadSample, isSimulating, onToggleSimulation }) {
+export default function Navbar({ trafficStats, apiOnline, engineMode, onQuickLoadSample, isSimulating, onToggleSimulation }) {
   const status = trafficStats?.network_status || 'PROTECTED';
   const statusClass = status.toLowerCase().replace(' ', '_');
+
+  const modeLabel = engineMode === 'backend' 
+    ? 'BACKEND API ONLINE' 
+    : (apiOnline ? 'BROWSER AI ENGINE' : 'OFFLINE');
+  const modeColor = engineMode === 'backend' 
+    ? '#10b981' 
+    : (apiOnline ? '#00f2fe' : '#ef4444');
 
   return (
     <header className="soc-navbar">
@@ -50,10 +57,10 @@ export default function Navbar({ trafficStats, apiOnline, onQuickLoadSample, isS
           {status}
         </div>
 
-        {/* API Link Health */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', fontSize: '0.75rem', color: apiOnline ? '#10b981' : '#ef4444' }}>
-          <span style={{ width: '6px', height: '6px', borderRadius: '50%', background: apiOnline ? '#10b981' : '#ef4444' }}></span>
-          {apiOnline ? 'SOC CORE ONLINE' : 'DISCONNECTED'}
+        {/* API / Engine Health */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', fontSize: '0.75rem', color: modeColor }}>
+          <span style={{ width: '6px', height: '6px', borderRadius: '50%', background: modeColor }}></span>
+          {modeLabel}
         </div>
       </div>
     </header>

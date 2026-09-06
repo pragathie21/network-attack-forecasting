@@ -79,15 +79,21 @@ async def predict_single_flow(flow: FlowFeatures, db: Session = Depends(get_db))
 @router.post("/upload-traffic", response_model=UploadResponse)
 async def upload_traffic_csv(file: UploadFile = File(...), db: Session = Depends(get_db)):
     """Upload network traffic CSV, process flows, compute window forecasting & save to DB."""
-    if not file.filename.endswith(".csv"):
+    if not file.filename.lower().endswith(".csv"):
         raise HTTPException(status_code=400, detail="Only CSV files are supported.")
 
     try:
         content = await file.read()
-        df = pd.read_csv(io.BytesIO(content))
-        
-        if df.empty:
+        if not content or len(content.strip()) == 0:
             raise HTTPException(status_code=400, detail="Uploaded CSV file is empty.")
+
+        try:
+            df = pd.read_csv(io.BytesIO(content))
+        except (pd.errors.EmptyDataError, pd.errors.ParserError) as pe:
+            raise HTTPException(status_code=400, detail=f"Invalid CSV structure: {str(pe)}")
+        
+        if df.empty or len(df) == 0:
+            raise HTTPException(status_code=400, detail="Uploaded CSV file contains no records.")
 
         # Batch prediction
         results = predictor.predict_batch_df(df)
@@ -128,6 +134,9 @@ async def upload_traffic_csv(file: UploadFile = File(...), db: Session = Depends
             records_processed=len(df),
             summary=WindowForecastSummary(**summary_dict)
         )
+    except HTTPException:
+        db.rollback()
+        raise
     except Exception as e:
         db.rollback()
         raise HTTPException(status_code=500, detail=f"Failed to process traffic CSV: {str(e)}")

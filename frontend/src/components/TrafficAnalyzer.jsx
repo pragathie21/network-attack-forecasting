@@ -1,11 +1,12 @@
 import React, { useState, useRef } from 'react';
-import { api } from '../services/api';
+import { api, RAW_GITHUB_SAMPLE_URL, GITHUB_VIEW_URL } from '../services/api';
 
 export default function TrafficAnalyzer({ onDataUpdated, isSimulating, onToggleSimulation }) {
   const [isUploading, setIsUploading] = useState(false);
   const [uploadStatus, setUploadStatus] = useState(null);
   const [isDragging, setIsDragging] = useState(false);
   const [activeSubTab, setActiveSubTab] = useState('upload'); // 'upload' | 'single'
+  const [csvUrl, setCsvUrl] = useState('');
   const fileInputRef = useRef(null);
 
   // Single Flow Form State
@@ -45,13 +46,19 @@ export default function TrafficAnalyzer({ onDataUpdated, isSimulating, onToggleS
 
   const handleFileSelect = async (e) => {
     if (e.target.files && e.target.files[0]) {
-      await processFileUpload(e.target.files[0]);
+      const file = e.target.files[0];
+      e.target.value = ''; // Reset so same file can be re-selected
+      await processFileUpload(file);
     }
   };
 
   const processFileUpload = async (file) => {
-    if (!file.name.endsWith('.csv')) {
-      setUploadStatus({ type: 'error', message: 'Please select a valid CSV file.' });
+    if (!file || !file.name.toLowerCase().endsWith('.csv')) {
+      setUploadStatus({ type: 'error', message: 'Please select a valid CSV file (*.csv).' });
+      return;
+    }
+    if (file.size === 0) {
+      setUploadStatus({ type: 'error', message: 'The selected CSV file is empty (0 bytes).' });
       return;
     }
     setIsUploading(true);
@@ -87,6 +94,44 @@ export default function TrafficAnalyzer({ onDataUpdated, isSimulating, onToggleS
       setUploadStatus({
         type: 'error',
         message: err.message || 'Failed to load demo dataset.',
+      });
+    } finally {
+      setIsUploading(false);
+    }
+  };
+
+  const handleDownloadSample = () => {
+    // Attempt relative path first, fallback to raw GitHub link
+    const link = document.createElement('a');
+    link.href = './data/sample_cicids2018_test.csv';
+    link.download = 'sample_cicids2018_test.csv';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    setUploadStatus({
+      type: 'success',
+      message: 'Downloaded sample_cicids2018_test.csv. You can now drag and drop it into the analyzer.',
+    });
+  };
+
+  const handleLoadUrl = async () => {
+    if (!csvUrl.trim()) {
+      setUploadStatus({ type: 'error', message: 'Please enter a valid CSV URL.' });
+      return;
+    }
+    setIsUploading(true);
+    setUploadStatus(null);
+    try {
+      const res = await api.loadCsvFromUrl(csvUrl);
+      setUploadStatus({
+        type: 'success',
+        message: `Loaded ${res.records_processed} flows from remote CSV URL.`,
+      });
+      if (onDataUpdated) onDataUpdated(res.summary);
+    } catch (err) {
+      setUploadStatus({
+        type: 'error',
+        message: err.message || 'Failed to fetch CSV from URL.',
       });
     } finally {
       setIsUploading(false);
@@ -142,8 +187,16 @@ export default function TrafficAnalyzer({ onDataUpdated, isSimulating, onToggleS
                 className="btn-secondary"
                 onClick={handleLoadSample}
                 disabled={isUploading}
+                title="Directly load and analyze sample dataset"
               >
                 Load Pre-Packaged CIC-IDS2018 Demo
+              </button>
+              <button
+                className="btn-icon"
+                onClick={handleDownloadSample}
+                title="Download sample_cicids2018_test.csv to test drag-and-drop upload"
+              >
+                📥 Download Sample CSV
               </button>
             </div>
           </div>
@@ -190,6 +243,66 @@ export default function TrafficAnalyzer({ onDataUpdated, isSimulating, onToggleS
               {uploadStatus.type === 'success' ? '✅ ' : '❌ '} {uploadStatus.message}
             </div>
           )}
+
+          {/* URL & GitHub Link Ingestion Card */}
+          <div style={{ background: 'rgba(255,255,255,0.02)', padding: '1.1rem', borderRadius: 'var(--radius-md)', border: '1px solid var(--border-subtle)', display: 'flex', flexDirection: 'column', gap: '0.6rem' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '0.5rem' }}>
+              <div style={{ fontSize: '0.88rem', fontWeight: 700, color: '#fff', display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
+                <span>🌐</span> Ingest CSV via Web or GitHub Link
+              </div>
+              <div style={{ display: 'flex', gap: '0.4rem' }}>
+                <a
+                  href={RAW_GITHUB_SAMPLE_URL}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="btn-icon"
+                  style={{ fontSize: '0.75rem', padding: '0.25rem 0.55rem', textDecoration: 'none', color: 'var(--neon-cyan)', border: '1px solid rgba(0, 242, 254, 0.3)' }}
+                >
+                  Direct Raw CSV Link ↗
+                </a>
+                <button
+                  type="button"
+                  className="btn-icon"
+                  style={{ fontSize: '0.75rem', padding: '0.25rem 0.55rem' }}
+                  onClick={() => setCsvUrl(RAW_GITHUB_SAMPLE_URL)}
+                >
+                  Auto-fill Sample Link
+                </button>
+              </div>
+            </div>
+
+            <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
+              <input
+                type="url"
+                placeholder="Paste CSV URL (e.g. raw GitHub or GitHub file link)..."
+                value={csvUrl}
+                onChange={(e) => setCsvUrl(e.target.value)}
+                style={{
+                  flex: '1 1 260px',
+                  background: 'var(--bg-secondary)',
+                  border: '1px solid var(--border-subtle)',
+                  borderRadius: 'var(--radius-sm)',
+                  padding: '0.5rem 0.8rem',
+                  color: '#fff',
+                  fontSize: '0.85rem',
+                  fontFamily: 'var(--font-mono)'
+                }}
+              />
+              <button
+                type="button"
+                className="btn-primary"
+                onClick={handleLoadUrl}
+                disabled={isUploading || !csvUrl.trim()}
+                style={{ whiteSpace: 'nowrap' }}
+              >
+                {isUploading ? 'Fetching...' : 'Fetch & Ingest CSV'}
+              </button>
+            </div>
+
+            <div style={{ fontSize: '0.78rem', color: 'var(--text-muted)', lineHeight: 1.4 }}>
+              <strong>Notice:</strong> Standard GitHub links with <code>/blob/</code> contain HTML wrappers. Our system automatically rectifies them to <code>raw.githubusercontent.com</code> direct CSV data.
+            </div>
+          </div>
 
           {/* Simulation Info Callout */}
           <div style={{ background: 'rgba(255,255,255,0.02)', padding: '1rem', borderRadius: 'var(--radius-md)', border: '1px solid var(--border-subtle)', fontSize: '0.82rem', color: 'var(--text-secondary)' }}>

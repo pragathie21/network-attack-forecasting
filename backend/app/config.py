@@ -33,5 +33,8 @@ class Settings(BaseModel):
     WINDOW_SIZE_FLOWS: int = 15
     RISK_THRESHOLD_MEDIUM: float = 30.0
     RISK_THRESHOLD_HIGH: float = 70.0
+    
+    # CORS Configuration
+    CORS_ORIGINS: str = os.getenv("CORS_ORIGINS", "*")
 
 settings = Settings()

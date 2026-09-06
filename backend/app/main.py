@@ -46,10 +46,18 @@ app = FastAPI(
 )
 
 # Enable CORS for frontend dashboard
+cors_origins_raw = settings.CORS_ORIGINS.strip()
+if cors_origins_raw == "*":
+    origins = ["*"]
+    allow_creds = False
+else:
+    origins = [orig.strip() for orig in cors_origins_raw.split(",") if orig.strip()]
+    allow_creds = True
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
-    allow_credentials=True,
+    allow_origins=origins,
+    allow_credentials=allow_creds,
     allow_methods=["*"],
     allow_headers=["*"],
 )

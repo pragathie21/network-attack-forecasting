@@ -62,7 +62,8 @@ export default function App() {
   const [trafficStats, setTrafficStats] = useState(DEMO_TRAFFIC_STATS);
   const [forecastSummary, setForecastSummary] = useState(DEMO_FORECAST_SUMMARY);
   const [alerts, setAlerts] = useState(DEMO_FORECAST_SUMMARY.recent_alerts);
-  const [apiOnline, setApiOnline] = useState(false);
+  const [apiOnline, setApiOnline] = useState(true);
+  const [engineMode, setEngineMode] = useState('client');
   const [selectedMitre, setSelectedMitre] = useState(null);
   const [isSimulating, setIsSimulating] = useState(false);
   const simulationIntervalRef = useRef(null);
@@ -77,19 +78,24 @@ export default function App() {
     try {
       const health = await api.getHealth();
       setApiOnline(health.status === 'HEALTHY');
+      setEngineMode(health.mode || 'client');
 
       const stats = await api.getTrafficStats();
-      setTrafficStats(stats);
+      if (stats) setTrafficStats(stats);
 
       const forecast = await api.getCurrentForecast();
-      setForecastSummary(forecast);
+      if (forecast) setForecastSummary(forecast);
 
       const alertList = await api.getAlerts(25);
-      setAlerts(alertList.length > 0 ? alertList : (forecast.recent_alerts || []));
+      if (alertList && alertList.length > 0) {
+        setAlerts(alertList);
+      } else if (forecast?.recent_alerts) {
+        setAlerts(forecast.recent_alerts);
+      }
     } catch (err) {
-      console.warn('Live API not reached, running in standalone cloud demonstration mode:', err);
-      setApiOnline(false);
-      // Fallback demo data already set in state
+      console.warn('API fetch warning, running in standalone client AI mode:', err);
+      setApiOnline(true);
+      setEngineMode('client');
     }
   };
 
@@ -171,14 +177,11 @@ export default function App() {
   };
 
   const handleQuickLoadDemo = async () => {
-    if (apiOnline) {
-      try {
-        const res = await api.loadSampleDataset();
-        handleDataUpdated(res.summary);
-      } catch (err) {
-        alert(`Demo load failed: ${err.message}`);
-      }
-    } else {
+    try {
+      const res = await api.loadSampleDataset();
+      handleDataUpdated(res.summary);
+    } catch (err) {
+      console.warn('Demo load fallback:', err);
       setForecastSummary(DEMO_FORECAST_SUMMARY);
       setTrafficStats(DEMO_TRAFFIC_STATS);
       setAlerts(DEMO_FORECAST_SUMMARY.recent_alerts);
@@ -193,6 +196,7 @@ export default function App() {
       <Navbar
         trafficStats={trafficStats}
         apiOnline={apiOnline}
+        engineMode={engineMode}
         onQuickLoadSample={handleQuickLoadDemo}
         isSimulating={isSimulating}
         onToggleSimulation={handleToggleSimulation}

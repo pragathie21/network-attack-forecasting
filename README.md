@@ -4,7 +4,12 @@
 [![Deploy to Render](https://render.com/images/deploy-to-render-button.svg)](https://render.com/deploy?repo=https://github.com/pragathie21/network-attack-forecasting)
 
 > 🌐 **Live Website**: **[https://pragathie21.github.io/network-attack-forecasting/](https://pragathie21.github.io/network-attack-forecasting/)**  
-> 📦 **GitHub Repository**: **[https://github.com/pragathie21/network-attack-forecasting](https://github.com/pragathie21/network-attack-forecasting)**
+> 📦 **GitHub Repository**: **[https://github.com/pragathie21/network-attack-forecasting](https://github.com/pragathie21/network-attack-forecasting)**  
+> 📥 **Direct Raw Sample CSV Download**: **[https://raw.githubusercontent.com/pragathie21/network-attack-forecasting/main/backend/data/sample_cicids2018_test.csv](https://raw.githubusercontent.com/pragathie21/network-attack-forecasting/main/backend/data/sample_cicids2018_test.csv)**  
+> 🔍 **GitHub Web Table Viewer**: **[backend/data/sample_cicids2018_test.csv](https://github.com/pragathie21/network-attack-forecasting/blob/main/backend/data/sample_cicids2018_test.csv)**
+
+> [!TIP]
+> **GitHub CSV Link Note:** When fetching or downloading CSV files from GitHub, standard links containing `/blob/` render an HTML page wrapper and cannot be parsed as raw CSV by applications. Always use the **`raw.githubusercontent.com`** URL shown above for direct downloads or programmatic ingestion.
 
 An AI-powered cybersecurity prototype that analyzes network traffic flows, identifies abnormal traffic signatures, and **forecasts cyber attacks before or during early escalation stages**. 
 
@@ -235,9 +240,11 @@ The SOC Dashboard will open at **`http://localhost:5173`**.
    - In the navbar or Dataset tab, click **"Simulate Stream"**.
    - Watch real-time flow arrivals every 2.5 seconds as the engine transitions from:
      `Normal Baseline (15% Risk)` → `Reconnaissance Probing (50% Risk)` → `Active Attack Surge (90% Risk)` → `Mitigation`.
-4. **Custom CSV Upload**:
+4. **Custom CSV Upload & Remote Ingestion**:
    - Go to the **Dataset & Simulator** tab.
-   - Drag and drop any network flow CSV file (e.g. `backend/data/sample_cicids2018_test.csv`) to analyze external traffic captures.
+   - Click **"📥 Download Sample CSV"** to download `sample_cicids2018_test.csv` directly to your device.
+   - Drag and drop any network flow CSV file to analyze traffic captures.
+   - Or paste a remote CSV link under **"Ingest CSV via Web or GitHub Link"** (supports direct raw links or standard GitHub links with automatic rectification).
 5. **MITRE ATT&CK Playbook Inspection**:
    - Click any **MITRE technique button** (e.g. `T1498`) to open the interactive Incident Response Playbook modal.
 
